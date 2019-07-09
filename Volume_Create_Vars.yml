@@ -1,0 +1,13 @@
+hostname: "10.10.10.10"
+username: "admin"
+password: "netapp123"
+vserver: "ansibleSVM" 
+aggr: aggr1
+vol_name: "Test_1"
+size: 10
+size_unit: gb
+policy: default
+#NVE: "true"
+autosize_grow_threshold_percent: 80%
+autosize_maximum: 30GB
+comment_string: "Task Order#12345"
