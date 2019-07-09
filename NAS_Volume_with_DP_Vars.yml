@@ -1,0 +1,19 @@
+hostname: "10.10.10.10"
+username: "admin"
+password: "netapp123"
+source_hostname: "10.10.10.10"
+source_username: "admin"
+source_password: "netapp123"
+vserver: "ansibleSVM"
+destination_vserver: "svm1"
+aggr: aggr1
+vol_name: "NITC_Test"
+size: 10
+size_unit: gb
+policy: default
+#NVE: "true"
+autosize_grow_threshold_percent: 80%
+autosize_maximum: 30GB
+comment_string: "Task Order#12345"
+schedule: "hourly"
+SM_schedule: "daily"

@@ -1,0 +1,98 @@
+---
+- hosts: localhost
+  name: New NAS Volume Creation with DP setup
+  vars:
+    login: &login
+      hostname: "{{ hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      #source_hostname: "{{ source_hostname }}"
+      #source_username: "{{ source_username }}"
+      #source_password: "{{ source_password }}"
+      https: true
+      validate_certs: false
+  tasks:
+  - name: Source Volume Create
+    na_ontap_volume:
+      state: present
+      name: "{{ vol_name }}"
+      vserver: "{{ vserver }}"
+      type: RW
+      aggregate_name: "{{ aggr }}"
+      size: "{{ size }}"
+      size_unit: "{{ size_unit }}"
+      space_guarantee: none
+      policy: "{{ policy }}"
+      junction_path: "/{{ vol_name }}"
+      #encrypt: "{{ NVE }}"
+      wait_for_completion: true
+      <<: *login
+  - name: Volume Modify 
+    na_ontap_command:
+      command: ['volume', 'modify', '-volume', "{{ vol_name }}", '-vserver', "{{ vserver }}", '-autosize-grow-threshold-percent', "{{ autosize_grow_threshold_percent }}", '-max-autosize', "{{ autosize_maximum }}", '-comment', "{{ comment_string }}"]
+      privilege: 'admin'
+      <<: *login
+  - name: Local SnapVault Volume Create
+    na_ontap_volume:
+      state: present
+      name: "{{ vol_name }}_SV"
+      vserver: "{{ vserver }}"
+      type: DP
+      aggregate_name: "{{ aggr }}"
+      size: "{{ size }}"
+      size_unit: "{{ size_unit }}"
+      space_guarantee: none
+      policy: "{{ policy }}"
+      #junction_path: "/{{ vol_name }}_SV"
+      #encrypt: "{{ NVE }}"
+      wait_for_completion: true
+      <<: *login
+  - name: Volume Modify 
+    na_ontap_command:
+      command: ['volume', 'modify', '-volume', "{{ vol_name }}_SV", '-vserver', "{{ vserver }}", '-autosize-grow-threshold-percent', "{{ autosize_grow_threshold_percent }}", '-max-autosize', "{{ autosize_maximum }}", '-comment', "{{ comment_string }}"]
+      privilege: 'admin'
+      <<: *login
+  - name: Destination SnapMirror Volume Create
+    na_ontap_volume:
+      state: present
+      name: "{{ vol_name }}_SV_SM"
+      vserver: "{{ destination_vserver }}"
+      type: DP
+      aggregate_name: "{{ aggr }}"
+      size: "{{ size }}"
+      size_unit: "{{ size_unit }}"
+      space_guarantee: none
+      policy: "{{ policy }}"
+      #junction_path: "/{{ vol_name }}_SV_SM"
+      #encrypt: "{{ NVE }}"
+      wait_for_completion: true
+      <<: *login
+  - name: Volume Modify 
+    na_ontap_command:
+      command: ['volume', 'modify', '-volume', "{{ vol_name }}_SV_SM", '-vserver', "{{ vserver }}", '-autosize-grow-threshold-percent', "{{ autosize_grow_threshold_percent }}", '-max-autosize', "{{ autosize_maximum }}", '-comment', "{{ comment_string }}"]
+      privilege: 'admin'
+      <<: *login
+  - name: Create Local SnapVault
+    na_ontap_snapmirror:
+      state: present
+      source_volume: "{{ vol_name }}"
+      destination_volume: "{{ vol_name }}_SV"
+      source_vserver: "{{ vserver }}"
+      destination_vserver: "{{ vserver }}"
+      schedule: "{{ schedule }}"
+      relationship_type: extended_data_protection
+      policy: XDPDefault
+      #wait_for_completion: true
+      <<: *login
+  - name: Create Destniation Mirror 
+    na_ontap_snapmirror:
+      state: present
+      source_volume: "{{ vol_name }}_SV"
+      destination_volume: "{{ vol_name }}_SV_SM"
+      source_vserver: "{{ vserver }}"
+      destination_vserver: "{{ destination_vserver }}"
+      schedule: "{{ SM_schedule }}"
+      relationship_type: extended_data_protection
+      policy: MirrorAllSnapshots
+      #wait_for_completion: true
+      <<: *login
