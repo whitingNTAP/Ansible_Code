@@ -2,8 +2,8 @@ hostname: "10.10.10.10"
 username: "admin"
 password: "netapp123"
 vserver: "ansibleSVM"
-#address: 10.10.10.50
-#netmask: 255.255.255.0
+address: 10.10.10.50
+netmask: 255.255.255.0
 aggr: aggr1
 vol_name: Test_2
 size: 20
