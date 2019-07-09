@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  name: New Volume
+  vars:
+    login: &login
+      hostname: "{{ hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      https: true
+      validate_certs: false
+  tasks:
+  - name: Volume Create
+    na_ontap_volume:
+      state: present
+      name: "{{ vol_name }}"
+      vserver: "{{ vserver }}"
+      aggregate_name: "{{ aggr }}"
+      size: "{{ size }}"
+      size_unit: "{{ size_unit }}"
+      policy: "{{ policy }}"
+      junction_path: "/{{ vol_name }}"
+      <<: *login
+  - name: Volume Modify
+    na_ontap_command:
+      command: ['volume', 'modify', '-volume', "{{ vol_name }}", '-vserver', "{{ vserver }}", '-autosize-grow-threshold-percent', "{{ threshold_percent }}", '-max-autosize', "{{ autosize_maximum }}"]
+      <<: *login
