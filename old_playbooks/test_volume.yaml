@@ -1,0 +1,52 @@
+--- 
+- hosts: localhost 
+  name: Setup ONTAP 
+  connection: local
+  vars: 
+    hostname: "10.26.67.128" 
+    username: "admin" 
+    volname: ansibleVolume 
+    vserver: ansibleVserver 
+    aggr: n1_aggr1 
+    policy: ansiblePolicy 
+    state: present 
+  vars_prompt: 
+  - name: "password" 
+    prompt: "Password:" 
+  tasks: 
+  - name: Create Policy 
+    na_ontap_export_policy: 
+      state: "{{ state }}" 
+      name: "{{ policy }}" 
+      vserver: "{{ vserver }}" 
+      hostname: "{{ hostname }}" 
+      username: "{{ username }}" 
+      password: "{{ password }}" 
+  - name: Setup rules 
+    na_ontap_export_policy_rule: 
+      state: "{{ state }}" 
+      policy_name: "{{ policy }}" 
+      vserver: "{{ vserver }}" 
+      client_match: 0.0.0.0/0  
+      ro_rule: sys 
+      rw_rule: sys 
+      super_user_security: sys 
+      hostname: "{{ hostname }}" 
+      username: "{{ username }}" 
+      password: "{{ password }}" 
+  - name: Create volume 
+    na_ontap_volume: 
+      state: "{{ state }}" 
+      name: "{{ volname }}" 
+      aggregate_name: "{{ aggr }}" 
+      size: 1 
+      size_unit: gb 
+      policy: "{{ policy }}" 
+      junction_path: "/{{ volname }}" 
+      space_guarantee: "none"
+      type: "RW"
+      vserver: "{{ vserver }}" 
+      hostname: "{{ hostname }}" 
+      username: "{{ username }}" 
+      password: "{{ password }}" 
+

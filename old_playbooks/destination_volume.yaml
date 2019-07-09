@@ -1,0 +1,45 @@
+---
+- hosts: localhost
+  name: Create Source/Destination Volume and SnapMirror Relationship
+  gather_facts: no
+  connection: local
+
+  vars:
+    destination_netapp_hostname: 10.26.67.128  
+    netapp_username: admin 
+    state: present 
+    
+  vars_prompt:
+   - name: "netapp_password"
+     prompt: "Enter NetApp Cluster Password"
+     private: yes
+   - name: "export_policy"
+     prompt: "Enter Volume Export Policy"
+     private: no
+   - name: "destination_vserver"
+     prompt: "Enter Destination Vserver"
+     private: no
+   - name: "destination_volume"
+     prompt: "Enter Destination Volume Name"
+     private: no
+   - name: "destination_aggregate_name"
+     prompt: "Enter Destination Aggregate"
+     private: no
+  
+  tasks:
+   - name: Create Destination Volume  
+     na_ontap_volume: 
+      state: "{{ state }}" 
+      name: "{{ destination_volume }}" 
+      aggregate_name: "{{ destination_aggregate_name }}" 
+      size: 1 
+      size_unit: gb 
+      policy: "{{ export_policy }}" 
+      junction_path: "/{{ destination_volume }}" 
+      space_guarantee: "none" 
+      type: DP
+      vserver: "{{ destination_vserver }}" 
+      hostname: "{{ destination_netapp_hostname }}" 
+      username: "{{ netapp_username }}" 
+      password: "{{ netapp_password }}"
+

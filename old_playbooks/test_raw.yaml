@@ -1,0 +1,13 @@
+---
+- hosts: netapp
+  name: RAW CLI Commnads with Variables
+  connection: local
+
+  vars_prompt:
+  - name: "password" 
+    prompt: "Password:"
+  tasks:
+  - name: Run RAW Volume create 
+    raw: volume create -vserver ansibleVserver -volume raw_volume -aggregate n1_aggr1 -size 1gb
+
+   

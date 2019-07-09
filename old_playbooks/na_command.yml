@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  name: New Volume
+  vars:
+    login: &login
+      hostname: "{{ hostname }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      https: true
+      validate_certs: false
+  tasks:
+  - name: Volume Modify
+    na_ontap_command:
+      command: ['volume', 'modify', '-volume', "{{ vol_name }}", '-vserver', "{{ vserver }}", '-autosize-grow-threshold-percent', "{{ threshold_percent }}", '-max-autosize', "{{ autosize_maximum }}"]
+      <<: *login
