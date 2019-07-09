@@ -22,5 +22,5 @@
       <<: *login
   - name: Volume Modify
     na_ontap_command:
-      command: ['volume', 'modify', '-volume', "{{ vol_name }}", '-vserver', "{{ vserver }}", '-autosize-grow-threshold-percent', "{{ threshold_percent }}", '-max-autosize', "{{ autosize_maximum }}"]
+      command: ['volume', 'modify', '-volume', "{{ vol_name }}", '-vserver', "{{ vserver }}", '-autosize-grow-threshold-percent', "{{ autosize_grow_threshold_percent }}", '-max-autosize', "{{ autosize_maximum }}"]
       <<: *login
