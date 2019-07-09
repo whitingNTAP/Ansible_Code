@@ -5,9 +5,9 @@ vserver: "ansibleSVM"
 #address: 10.10.10.50
 #netmask: 255.255.255.0
 aggr: aggr1
-vol_name: NITC_Test_2
+vol_name: Test_2
 size: 20
 size_unit: gb
 policy: default
-threshold_percent: 80%
+autosize_grow_threshold_percent: 80%
 autosize_maximum: 30GB
