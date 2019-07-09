@@ -56,21 +56,23 @@
       rw_rule: any  
       super_user_security: none
       <<: *login
-  - name: Volume Create
+  - name: Source Volume Create
     na_ontap_volume:
       state: present
       name: "{{ vol_name }}"
       vserver: "{{ vserver }}"
+      type: RW
       aggregate_name: "{{ aggr }}"
       size: "{{ size }}"
       size_unit: "{{ size_unit }}"
+      space_guarantee: none
       policy: "{{ policy }}"
       junction_path: "/{{ vol_name }}"
-      hostname: "{{ hostname }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
+      #encrypt: "{{ NVE }}"
+      wait_for_completion: true
       <<: *login
-  - name: Volume Modify
+  - name: Volume Modify 
     na_ontap_command:
-      command: ['volume', 'modify', '-volume', "{{ vol_name }}", '-vserver', "{{ vserver }}", '-autosize-grow-threshold-percent', "{{ autosize_grow_threshold_percent }}", '-max-autosize', "{{ autosize_maximum }}"]
+      command: ['volume', 'modify', '-volume', "{{ vol_name }}", '-vserver', "{{ vserver }}", '-autosize-grow-threshold-percent', "{{ autosize_grow_threshold_percent }}", '-max-autosize', "{{ autosize_maximum }}", '-comment', "{{ comment_string }}"]
+      privilege: 'admin'
       <<: *login
